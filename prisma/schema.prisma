@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model agendamentos {
+  id           BigInt     @id @default(autoincrement())
+  cliente_id   BigInt?
+  barbeiro_id  BigInt?
+  data         DateTime?  @db.Date
+  hora         DateTime?  @db.Time(6)
+  servicos     String[]
+  status       String?
+  data_criacao DateTime?  @default(now()) @db.Timestamp(6)
+  barbeiros    barbeiros? @relation(fields: [barbeiro_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuarios     usuarios?  @relation(fields: [cliente_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model avaliacoes {
+  id             BigInt     @id @default(autoincrement())
+  barbeiro_id    BigInt?
+  cliente_id     BigInt?
+  nota           Int?
+  comentario     String?
+  data_avaliacao DateTime?  @default(now()) @db.Timestamp(6)
+  barbeiros      barbeiros? @relation(fields: [barbeiro_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuarios       usuarios?  @relation(fields: [cliente_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model barbeiros {
+  id                  BigInt         @id @default(autoincrement())
+  usuario_id          BigInt?
+  especialidades      String[]
+  atende_domicilio    Boolean?
+  avaliacao           Decimal?       @db.Decimal
+  servicos_oferecidos String[]
+  localizacao         String?
+  agendamentos        agendamentos[]
+  avaliacoes          avaliacoes[]
+  usuarios            usuarios?      @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  trabalhos           trabalhos[]
+}
+
+model trabalhos {
+  id           BigInt     @id @default(autoincrement())
+  barbeiro_id  BigInt?
+  tipo_cabelo  String?
+  descricao    String?
+  imagem       String?
+  data_criacao DateTime?  @default(now()) @db.Timestamp(6)
+  barbeiros    barbeiros? @relation(fields: [barbeiro_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model usuarios {
+  id           BigInt         @id @default(autoincrement())
+  nome         String?
+  email        String         @unique
+  senha        String
+  tipo         String?
+  foto_perfil  String?
+  localizacao  String?
+  data_criacao DateTime?      @default(now()) @db.Timestamp(6)
+  agendamentos agendamentos[]
+  avaliacoes   avaliacoes[]
+  barbeiros    barbeiros[]
+}
