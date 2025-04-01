@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import userRoutes from "./src/routes/userRoutes.js";
 import authRoutes from "./src/routes/authRoutes.js";
-
+import agendamentoRoutes from './src/routes/agendamentosRoutes.js';
 
 dotenv.config();
 
@@ -15,6 +15,8 @@ app.use(express.json());
 // Rotas
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/agendamentos', agendamentoRoutes);
+
 
 // Inicialização do servidor
 const PORT = process.env.PORT || 3000;
