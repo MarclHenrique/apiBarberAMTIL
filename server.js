@@ -13,7 +13,10 @@ const prisma = new PrismaClient();
 
 // Configuração do CORS
 app.use(cors({
-  origin: 'http://127.0.0.1:5500', // URL exata do seu frontend
+  origin: [
+    'https://landing-page-barber-gray.vercel.app',
+    'http://127.0.0.1:5500' // Mantenha para desenvolvimento local
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
