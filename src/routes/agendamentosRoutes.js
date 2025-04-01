@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { criarAgendamento, listarAgendamentosCliente, buscarAgendamento } from '../controllers/agendamentoscontroller.js';
+import { criarAgendamento } from '../controllers/agendamentoscontroller.js';
+import {authenticateJWT} from '../middlewares/authMiddleware.js'
 
 const router = Router();
 
-router.post('/', criarAgendamento); // Criar agendamento
-router.get('/cliente/:clienteId', listarAgendamentosCliente); // Listar agendamentos por cliente
-router.get('/:id', buscarAgendamento); // Buscar agendamento por ID
+// Rota protegida para criar agendamento (somente usuários logados)
+router.post('/agendar', authenticateJWT, criarAgendamento);
 
 export default router;

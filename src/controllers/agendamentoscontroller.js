@@ -1,42 +1,41 @@
-import { createAgendamento, getAgendamentosByCliente, getAgendamentoById } from '../services/agendamentosServices.js';
+import { prisma } from '../utils/database.js';
 
 export const criarAgendamento = async (req, res) => {
-  const { cliente_id, barbeiro_id, data, hora, servicos, status } = req.body;
+  const { barbeiro_id, dataHora, servicos } = req.body;
 
-  if (!cliente_id || !barbeiro_id || !data || !hora || !servicos) {
-    return res.status(400).json({ message: "Campos obrigatórios faltando" });
+  if (!barbeiro_id || !dataHora || !servicos) {
+    return res.status(400).json({ message: 'Campos obrigatórios faltando' });
   }
 
   try {
-    const novoAgendamento = await createAgendamento({ cliente_id, barbeiro_id, data, hora, servicos, status });
-    res.status(201).json(novoAgendamento);
+    const [data, hora] = dataHora.split('T');
+    const cliente_id = req.user.id;
+
+    // Criar o agendamento
+    const novoAgendamento = await prisma.agendamentos.create({
+      data: {
+        usuarios: { connect: { id: cliente_id } },
+        barbeiros: { connect: { id: barbeiro_id } },
+        horario: new Date(`${data}T${hora}`),
+        servicos: servicos.split(',').map(servico => servico.trim()),
+      }
+    });
+
+    // Converter campos BigInt para String
+    const agendamentoFormatado = {
+      ...novoAgendamento,
+      id: novoAgendamento.id.toString(),
+      cliente_id: novoAgendamento.cliente_id.toString(),
+      barbeiro_id: novoAgendamento.barbeiro_id.toString(),
+    };
+
+    res.status(201).json({ 
+      message: 'Agendamento criado com sucesso!', 
+      agendamento: agendamentoFormatado 
+    });
+
   } catch (error) {
     console.error("Erro ao criar agendamento:", error);
     res.status(500).json({ message: "Erro ao criar agendamento", error });
-  }
-};
-
-export const listarAgendamentosCliente = async (req, res) => {
-  const { clienteId } = req.params;
-
-  try {
-    const agendamentos = await getAgendamentosByCliente(clienteId);
-    res.status(200).json(agendamentos);
-  } catch (error) {
-    res.status(500).json({ message: "Erro ao listar agendamentos", error });
-  }
-};
-
-export const buscarAgendamento = async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const agendamento = await getAgendamentoById(id);
-    if (!agendamento) {
-      return res.status(404).json({ message: "Agendamento não encontrado" });
-    }
-    res.status(200).json(agendamento);
-  } catch (error) {
-    res.status(500).json({ message: "Erro ao buscar agendamento", error });
   }
 };

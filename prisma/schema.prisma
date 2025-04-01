@@ -9,28 +9,26 @@ datasource db {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model agendamentos {
-  id           BigInt     @id @default(autoincrement())
-  cliente_id   BigInt?
-  barbeiro_id  BigInt?
-  data         DateTime?  @db.Date
-  hora         DateTime?  @db.Time(6)
+  id           BigInt    @id @default(autoincrement())
+  cliente_id   BigInt
+  barbeiro_id  BigInt
+  horario      DateTime  @db.Timestamp(6)
   servicos     String[]
-  status       String?
-  data_criacao DateTime?  @default(now()) @db.Timestamp(6)
-  barbeiros    barbeiros? @relation(fields: [barbeiro_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  usuarios     usuarios?  @relation(fields: [cliente_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  data_criacao DateTime? @default(now()) @db.Timestamp(6)
+  barbeiros    barbeiros @relation(fields: [barbeiro_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuarios     usuarios  @relation(fields: [cliente_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model avaliacoes {
-  id             BigInt     @id @default(autoincrement())
-  barbeiro_id    BigInt?
-  cliente_id     BigInt?
+  id             BigInt    @id @default(autoincrement())
+  barbeiro_id    BigInt
+  cliente_id     BigInt
   nota           Int?
   comentario     String?
-  data_avaliacao DateTime?  @default(now()) @db.Timestamp(6)
-  barbeiros      barbeiros? @relation(fields: [barbeiro_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  usuarios       usuarios?  @relation(fields: [cliente_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  data_avaliacao DateTime? @default(now()) @db.Timestamp(6)
+  barbeiros      barbeiros @relation(fields: [barbeiro_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuarios       usuarios  @relation(fields: [cliente_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model barbeiros {
